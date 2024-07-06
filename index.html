@@ -3,942 +3,304 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Storytelling</title>
-    <style> 
-        body {
-            font-family: 'Comic Sans MS', cursive, sans-serif;
-            background-color: #131213;
+    <title>Nexus Narrative: Immersive Storytelling</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6c5ce7;
+            --secondary-color: #00cec9;
+            --accent-color: #fdcb6e;
+            --dark-color: #2d3436;
+            --light-color: #dfe6e9;
+            --gradient-start: #6c5ce7;
+            --gradient-end: #00cec9;
+        }
+
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            color: var(--light-color);
+            min-height: 100vh;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            flex-direction: column;
+            overflow-x: hidden;
         }
-        
+
         .container {
-            width: 100%; /* Adjust the width as needed */
-            max-width: 1600px; /* Set a maximum width for larger screens */
-            background-color: #f90314;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            perspective: 1000px;
         }
-        
+
+        h1, h2, h3 {
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
         h1 {
-            color: #151414;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-            margin-bottom: 20px;
-            animation: bounce 1s ease infinite alternate;
+            font-size: 4rem;
+            text-align: center;
+            grid-column: 1 / -1;
+            background: linear-gradient(to right, var(--accent-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: glow 2s ease-in-out infinite alternate;
         }
-        
-        @keyframes bounce {
-            from {
-                transform: translateY(-5px);
-            }
-            to {
-                transform: translateY(5px);
-            }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 5px var(--accent-color), 0 0 10px var(--secondary-color); }
+            to { text-shadow: 0 0 10px var(--accent-color), 0 0 20px var(--secondary-color); }
         }
-        
-        .character-customization label {
-            color: #1e1d1e;
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-        
-        .character-customization input[type="text"],
-        .character-customization input[type="file"] {
+
+        .glass-panel:hover {
+            transform: translateY(-5px) rotateX(5deg);
+            box-shadow: 0 12px 48px 0 rgba(31, 38, 135, 0.5);
+        }
+
+        input, select, button {
             width: 100%;
-            margin-bottom: 15px;
-            padding: 8px;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
             border: none;
             border-radius: 5px;
-            background-color: #141314;
-            animation: float 2s ease infinite;
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--light-color);
+            font-family: 'Roboto', sans-serif;
+            transition: all 0.3s ease;
         }
-        
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-10px);
-            }
+
+        input:focus, select:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--accent-color);
         }
-        
-        .character-customization button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            background-color: #191819;
-            color: #fff;
-            font-size: 16px;
+
+        button {
+            background: var(--primary-color);
+            color: var(--light-color);
+            font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.3s ease;
-            animation: rotate 2s linear infinite;
         }
-        
-        @keyframes rotate {
-            from {
-                transform: rotate(0deg);
-            }
-            to {
-                transform: rotate(360deg);
-            }
+
+        button:hover {
+            background: var(--accent-color);
+            transform: scale(1.05);
         }
-        
-        .character-customization button:hover {
-            background-color: #151515;
-            animation: shake 0.5s ease infinite alternate;
+
+        .story-container {
+            height: 400px;
+            overflow-y: auto;
+            perspective: 1000px;
+            transform-style: preserve-3d;
         }
-        
-        @keyframes shake {
-            0% {
-                transform: translateX(0);
-            }
-            100% {
-                transform: translateX(5px);
-            }
+
+        .story-container::-webkit-scrollbar {
+            width: 10px;
         }
-        
-        .story {
-            margin-bottom: 20px;
-            color: #333;
-            font-size: 18px;
-            text-align: left;
-            padding: 20px;
-            border: 2px solid #ff0000;
+
+        .story-container::-webkit-scrollbar-thumb {
+            background: var(--accent-color);
             border-radius: 10px;
-            background-color: #f9e6ff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            animation: fadeIn 1s ease;
         }
-        
+
+        .story {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .choices {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
         .choices button {
-            padding: 10px 20px;
-            margin: 0 10px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            background-color: #1615164d;
-            color: #fff;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
-            animation: heartbeat 1s ease infinite;
+            flex: 1;
+            min-width: 150px;
         }
-        
-        .choices button:hover {
-            background-color: #100f10;
-            animation: bounce 0.5s ease infinite alternate;
+
+        #inventory-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 1rem;
         }
-        
-        @keyframes heartbeat {
-            0% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.1);
-            }
-            100% {
-                transform: scale(1);
-            }
+
+        .kinetic-text {
+            font-size: 2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            animation: kinetic 5s ease-in-out infinite;
         }
-        
-        .inventory {
+
+        @keyframes kinetic {
+            0%, 100% { transform: skew(0deg, 0deg); }
+            25% { transform: skew(5deg, 5deg); }
+            75% { transform: skew(-5deg, -5deg); }
+        }
+
+        .three-d-element {
+            width: 100px;
+            height: 100px;
+            background: var(--accent-color);
+            transform: rotateX(45deg) rotateY(45deg);
+            transition: transform 0.5s ease;
+            margin: 2rem auto;
+        }
+
+        .three-d-element:hover {
+            transform: rotateX(60deg) rotateY(60deg);
+        }
+
+        .micro-interaction {
+            transition: all 0.3s ease;
+        }
+
+        .micro-interaction:hover {
+            transform: scale(1.1);
+        }
+
+        .edgeless-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 15px;
+            margin-bottom: 1rem;
+        }
+
+        .retro-max {
+            background: repeating-linear-gradient(
+                45deg,
+                var(--primary-color),
+                var(--primary-color) 10px,
+                var(--accent-color) 10px,
+                var(--accent-color) 20px
+            );
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
             text-align: center;
+            text-transform: uppercase;
+            color: var(--dark-color);
+            text-shadow: 2px 2px var(--light-color);
+            margin-bottom: 1rem;
         }
-        
-        .inventory h2 {
-            color: #1b1a1b;
-            animation: rainbow 3s linear infinite;
-        }
-        
-        @keyframes rainbow {
-            0% {
-                color: red;
-            }
-            25% {
-                color: orange;
-            }
-            50% {
-                color: yellow;
-            }
-            75% {
-                color: green;
-            }
-            100% {
-                color: blue;
-            }
-        }
-        
-        #inventoryList {
-            list-style-type: none;
-            padding: 0;
-        }
-        
-        #inventoryList li {
-            margin-bottom: 5px;
-        }
-        
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-        /* Dropdown Styles */
-        .category-selection,
-        .story-selection {
-            margin-bottom: 20px;
+
+        .large-type {
+            font-size: 4rem;
+            font-weight: bold;
             text-align: center;
+            line-height: 1;
+            margin: 2rem 0;
         }
-        
-        .category-selection select,
-        .story-selection select {
-            padding: 10px;
-            font-size: 16px;
-            border: 2px solid #FF00CC;
-            border-radius: 5px;
-            background-color: #f9e6ff;
-            color: #333;
-            transition: border-color 0.3s ease;
-            appearance: none; /* Remove default dropdown arrow */
-        }
-        
-        .category-selection select:hover,
-        .story-selection select:hover {
-            border-color: #e600ac;
-        }
-        
-        /* Custom Dropdown Arrow */
-        .category-selection select::-ms-expand,
-        .story-selection select::-ms-expand {
-            display: none; /* Hide default arrow for IE */
-        }
-        
-        .category-selection select::after,
-        .story-selection select::after {
-            content: '\25BC'; /* Unicode for down arrow */
-            position: absolute;
-            top: 50%;
-            right: 10px;
-            transform: translateY(-50%);
-            pointer-events: none; /* Ensure the arrow doesn't interfere with clicking the select */
-        }
-        
-        /* Button Styles */
-        .container button {
-            padding: 15px 30px;
-            border: none;
-            border-radius: 5px;
-            background-color: #FF00CC;
-            color: #fff;
-            font-size: 18px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        
-        .container button:hover {
-            background-color: #e600ac;
-        }
-        /* Twinkle Animation */
-        .twinkle {
+
+        .layered-element {
             position: relative;
         }
-        
-        .twinkle::before {
+
+        .layered-element::before {
             content: '';
             position: absolute;
-            top: -10px;
-            left: -10px;
-            width: 20px;
-            height: 20px;
+            top: 10px;
+            left: 10px;
+            right: -10px;
+            bottom: -10px;
+            background: var(--secondary-color);
+            z-index: -1;
+            border-radius: 15px;
+        }
+
+        #voiceButton {
+            background: var(--accent-color);
+            color: var(--dark-color);
+            padding: 1rem;
             border-radius: 50%;
-            background-color: rgba(255, 255, 255, 0.5);
-            animation: twinkle 1s linear infinite alternate;
-        }
-        
-        @keyframes twinkle {
-            0% {
-                transform: scale(1);
-                opacity: 0.5;
-            }
-            100% {
-                transform: scale(1.2);
-                opacity: 0;
-            }
-        }
-        
-        /* Rainbow Border */
-        .rainbow-border {
-            border: 5px solid transparent;
-            background-clip: padding-box;
-            background-image: linear-gradient(to right, violet, indigo, blue, green, yellow, orange, red);
-            animation: rainbowBorder 5s linear infinite;
-        }
-        
-        @keyframes rainbowBorder {
-            0% {
-                background-position: 0 50%;
-            }
-            100% {
-                background-position: 100% 50%;
-            }
-        }
-        
-        /* Bounce Animation */
-        .bounce {
-            animation: bounce 1s infinite alternate;
-        }
-        
-        @keyframes bounce {
-            0% {
-                transform: translateY(-10px);
-            }
-            100% {
-                transform: translateY(10px);
-            }
-        }
-        
-        /* Floating Animation */
-        .float {
-            animation: float 2s infinite ease-in-out;
-        }
-        
-        @keyframes float {
-            0% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-20px);
-            }
-            100% {
-                transform: translateY(0);
-            }
-        }
-        
-        /* Pulse Animation */
-        .pulse {
-            animation: pulse 1s infinite;
-        }
-        
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.1);
-            }
-            100% {
-                transform: scale(1);
-            }
-        }
-        
-        /* Spin Animation */
-        .spin {
-            animation: spin 2s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-        
-        /* Wiggle Animation */
-        .wiggle {
-            animation: wiggle 1s infinite;
-        }
-        
-        @keyframes wiggle {
-            0% {
-                transform: rotate(0deg);
-            }
-            25% {
-                transform: rotate(-5deg);
-            }
-            50% {
-                transform: rotate(5deg);
-            }
-            75% {
-                transform: rotate(-5deg);
-            }
-            100% {
-                transform: rotate(0deg);
-            }
-        }
-        
-        /* Sparkle Animation */
-        .sparkle {
-            position: relative;
-        }
-        
-        .sparkle::before {
-            content: '\2605';
-            position: absolute;
-            top: -10px;
-            left: -10px;
-            font-size: 24px;
-            color: gold;
-            animation: sparkle 1s linear infinite alternate;
-        }
-        
-        @keyframes sparkle {
-            0% {
-                transform: scale(1);
-                opacity: 0.5;
-            }
-            100% {
-                transform: scale(1.2);
-                opacity: 0;
-            }
-        }
-        
-        /* Blink Animation */
-        .blink {
-            animation: blink 1s infinite alternate;
-        }
-        
-        @keyframes blink {
-            0% {
-                opacity: 1;
-            }
-            100% {
-                opacity: 0;
-            }
-        }
-        
-        /* Zoom Animation */
-        .zoom {
-            animation: zoom 1s infinite alternate;
-        }
-        
-        @keyframes zoom {
-            0% {
-                transform: scale(1);
-            }
-            100% {
-                transform: scale(1.1);
-            }
-        }
-        
-        /* Shake Animation */
-        .shake {
-            animation: shake 0.5s infinite alternate;
-        }
-        
-        @keyframes shake {
-            0% {
-                transform: translateX(0);
-            }
-            100% {
-                transform: translateX(5px);
-            }
-        }
-        
-        /* Slide Animation */
-        .slide {
-            animation: slide 1s infinite alternate;
-        }
-        
-        @keyframes slide {
-            0% {
-                transform: translateY(0);
-            }
-            100% {
-                transform: translateY(10px);
-            }
-        }
-        
-        /* Glow Animation */
-        .glow {
-            animation: glow 2s infinite alternate;
-        }
-        
-        @keyframes glow {
-            0% {
-                text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
-            }
-            100% {
-                text-shadow: 0 0 10px rgba(255, 255, 255, 1);
-            }
-        }
-        
-        /* Zoom Out Animation */
-        .zoom-out {
-            animation: zoomOut 1s infinite alternate;
-        }
-        
-        @keyframes zoomOut {
-            0% {
-                transform: scale(1);
-            }
-            100% {
-                transform: scale(0.9);
-            }
-        }
-        
-        /* Pop Animation */
-        .pop {
-            animation: pop 0.5s infinite alternate;
-        }
-        
-        @keyframes pop {
-            0% {
-                transform: scale(1);
-            }
-            100% {
-                transform: scale(1.1);
-            }
-        }
-        
-        /* Heartbeat Animation */
-        .heartbeat {
-            animation: heartbeat 1s infinite;
-        }
-        
-        @keyframes heartbeat {
-            0% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.2);
-                }
-        100% {
-        transform: scale(1);
-        }
-        }
-        
-        /* Spin and Grow Animation */
-        .spin-grow {
-        animation: spinGrow 2s infinite linear;
-        }
-        
-        @keyframes spinGrow {
-        0% {
-        transform: rotate(0deg) scale(1);
-        }
-        50% {
-        transform: rotate(180deg) scale(1.2);
-        }
-        100% {
-        transform: rotate(360deg) scale(1);
-        }
-        }
-        
-        /* Slide and Fade Animation */
-        .slide-fade {
-        animation: slideFade 1s infinite ease-in-out alternate;
-        }
-        
-        @keyframes slideFade {
-        0% {
-        transform: translateY(0) scale(1);
-        opacity: 1;
-        }
-        100% {
-        transform: translateY(20px) scale(0.8);
-        opacity: 0.5;
-        }
-        }
-        
-        /* Zigzag Animation */
-        .zigzag {
-        animation: zigzag 1s infinite alternate;
-        }
-        
-        @keyframes zigzag {
-        0% {
-        transform: translateX(0);
-        }
-        100% {
-        transform: translateX(10px);
-        }
-        }
-        
-        /* Flip Animation */
-        .flip {
-        animation: flip 1s infinite alternate;
-        }
-        
-        @keyframes flip {
-        0% {
-        transform: scaleX(1);
-        }
-        100% {
-        transform: scaleX(-1);
-        }
-        }
-        
-        /* Rubber Band Animation */
-        .rubber-band {
-        animation: rubberBand 1s infinite alternate;
-        }
-        
-        @keyframes rubberBand {
-        0% {
-        transform: scaleX(1);
-        }
-        50% {
-        transform: scaleX(1.2);
-        }
-        100% {
-        transform: scaleX(1);
-        }
-        }
-        /* Dropdown Styles */
-        .category-selection,
-        .story-selection {
-            margin-bottom: 20px;
-            text-align: center;
-            animation: spin-grow 2s infinite linear;
-        }
-        
-        .category-selection select,
-        .story-selection select {
-            padding: 10px;
-            font-size: 16px;
-            border: 2px solid #FF00CC;
-            border-radius: 5px;
-            background-color: #f9e6ff;
-            color: #333;
-            transition: border-color 0.3s ease;
-            appearance: none; /* Remove default dropdown arrow */
-            animation: slide-fade 1s infinite ease-in-out alternate;
-        }
-        
-        .category-selection select:hover,
-        .story-selection select:hover {
-            border-color: #e600ac;
-        }
-        
-        /* Custom Dropdown Arrow */
-        .category-selection select::-ms-expand,
-        .story-selection select::-ms-expand {
-            display: none; /* Hide default arrow for IE */
-        }
-        
-        .category-selection select::after,
-        .story-selection select::after {
-            content: '\25BC'; /* Unicode for down arrow */
-            position: absolute;
-            top: 50%;
-            right: 10px;
-            transform: translateY(-50%);
-            pointer-events: none; /* Ensure the arrow doesn't interfere with clicking the select */
-        }
-        
-        /* Button Styles */
-        .container button {
-            padding: 15px 30px;
-            border: none;
-            border-radius: 5px;
-            background-color: #FF00CC;
-            color: #fff;
-            font-size: 18px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        
-        .container button:hover {
-            background-color: #e600ac;
-        }
-        
-        /* Additional Animation Effects */
-        
-        /* Slide Animation */
-        .slide {
-            animation: slide 1s infinite alternate;
-        }
-        
-        @keyframes slide {
-            0% {
-                transform: translateY(0);
-            }
-            100% {
-                transform: translateY(10px);
-            }
-        }
-        
-        /* Glow Animation */
-        .glow {
-            animation: glow 2s infinite alternate;
-        }
-        
-        @keyframes glow {
-            0% {
-                text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
-            }
-            100% {
-                text-shadow: 0 0 10px rgba(255, 255, 255, 1);
-            }
-        }
-        
-        /* Zoom Out Animation */
-        .zoom-out {
-            animation: zoomOut 1s infinite alternate;
-        }
-        
-        @keyframes zoomOut {
-            0% {
-                transform: scale(1);
-            }
-            100% {
-                transform: scale(0.9);
-            }
-        }
-        
-        /* Pop Animation */
-        .pop {
-            animation: pop 0.5s infinite alternate;
-        }
-        
-        @keyframes pop {
-            0% {
-                transform: scale(1);
-            }
-            100% {
-                transform: scale(1.1);
-            }
-        }
-        
-        /* Heartbeat Animation */
-        .heartbeat {
-            animation: heartbeat 1s infinite;
-        }
-        
-        @keyframes heartbeat {
-            0% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.2);
-            }
-            100% {
-                transform: scale(1);
-            }
-        }
-        
-        /* Spin and Grow Animation */
-        .spin-grow {
-            animation: spinGrow 2s infinite linear;
-        }
-        
-        @keyframes spinGrow {
-            0% {
-                transform: rotate(0deg) scale(1);
-            }
-            50% {
-                transform: rotate(180deg) scale(1.2);
-            }
-            100% {
-                transform: rotate(360deg) scale(1);
-            }
-        }
-        
-        /* Slide and Fade Animation */
-        .slide-fade {
-            animation: slideFade 1s infinite ease-in-out alternate;
-        }
-        
-        @keyframes slideFade {
-            0% {
-                transform: translateY(0) scale(1);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(20px) scale(0.8);
-                opacity: 0.5;
-            }
-        }
-        
-        /* Zigzag Animation */
-        .zigzag {
-            animation: zigzag 1s infinite alternate;
-        }
-        
-        @keyframes zigzag {
-            0% {
-                transform: translateX(0);
-            }
-            100% {
-                transform: translateX(10px);
-            }
-        }
-        
-        /* Flip Animation */
-        .flip {
-            animation: flip 1s infinite alternate;
-        }
-        
-        @keyframes flip {
-            0% {
-                transform: scaleX(1);
-            }
-            100% {
-                transform: scaleX(-1);
-            }
-        }
-        
-        /* Rubber Band Animation */
-        .rubber-band {
-            animation: rubberBand 1s infinite alternate;
-        }
-        
-        @keyframes rubberBand {
-            0% {
-                transform: scaleX(1);
-            }
-            50% {
-                transform: scaleX(1.2);
-            }
-            100% {
-                transform: scaleX(1);
-            }
-        }
-        
-        /* Rotate Animation */
-        .rotate {
-            animation: rotate 1s infinite linear;
-        }
-        
-        @keyframes rotate {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-        
-        /* Skew Animation */
-        .skew {
-            animation: skew 1s infinite alternate;
-        }
-        
-        @keyframes skew {
-            0% {
-                transform: skewX(0deg);
-            }
-            100% {
-                transform: skewX(10deg);
-            }
-        }
-        
-        /* Fade In Animation */
-        .fade-in {
-            animation: fadeIn 1s infinite alternate;
-        }
-        
-        @keyframes fadeIn {
-            0% {
-                opacity: 0;
-            }
-            100% {
-                opacity: 1;
-            }
-        }
-        
-        /* Fade Out Animation */
-        .fade-out {
-            animation: fadeOut 1s infinite alternate;
-        }
-        
-        @keyframes fadeOut {
-            0% {
-                opacity: 1;
-            }
-            100% {
-                opacity: 0;
-            }
-        }
-        
-        /* Color Shift Animation */
-        .color-shift {
-            animation: colorShift 2s infinite alternate;
-        }
-        
-        @keyframes colorShift {
-            0% {
-                filter: hue-rotate(0deg);
-            }
-            100% {
-                filter: hue-rotate(360deg);
-            }
-        }
-        
-        /* Scale Animation */
-        .scale {
-            animation: scale 1s infinite alternate;
-        }
-        
-        @keyframes scale {
-            0% {
-                transform: scale(1);
-            }
-            100% {
-                transform: scale(1.2);
-            }
-        }
-        .inventory {
-            border: 2px solid #ccc;
-            padding: 10px;
-            border-radius: 5px;
-            background-color: #f9f9f9;
-            margin-top: 20px;
-        }
-        
-        .inventory h3 {
-            margin-top: 0;
-        }
-        
-        #inventory-list {
-            list-style-type: none;
-            padding: 0;
-        }
-        
-        #inventory-list li {
-            margin-bottom: 5px;
-        }
-        
-        #inventory-list li::before {
-            content: "\2022"; /* Bullet point */
-            color: #007bff; /* Blue color */
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 1rem;
+            height: 400px;
+            margin-bottom: 2rem;
+        }
+
+        .bento-item {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-weight: bold;
-            display: inline-block;
-            width: 1em;
-            margin-left: -1em;
         }
-        
+
+        .bento-item:nth-child(1) {
+            grid-column: 1 / 3;
+            grid-row: 1 / 3;
+        }
+
+        .bento-item:nth-child(2) {
+            grid-column: 3;
+            grid-row: 1 / 4;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Interactive Storytelling</h1>
-        <div class="character-customization">
-            <label for="charName">Character Name:</label>
-            <input type="text" id="charName" placeholder="Enter your name">
-            <label for="charImage">Character Image:</label>
-            <input type="file" id="charImage">
+        <h1>Nexus Narrative</h1>
+        
+        <div class="glass-panel layered-element">
+            <h2>Create Your Character</h2>
+            <input type="text" id="charName" placeholder="Enter your name" class="micro-interaction">
+            <input type="file" id="charImage" accept="image/*" class="micro-interaction">
         </div>
-        <div class="category-selection">
-            <label for="category">Select Category:</label>
-            <select id="category">
+
+        <div class="glass-panel">
+            <h2>Select Your Adventure</h2>
+            <select id="category" class="micro-interaction">
                 <!-- Categories will be dynamically populated here -->
             </select>
         </div>
-        <div class="story-selection">
-            <label for="story">Select Story:</label>
-            <select id="story">
+
+        <div class="glass-panel">
+            <h2>Choose Your Story</h2>
+            <select id="story" class="micro-interaction">
                 <!-- Stories will be dynamically populated here -->
             </select>
         </div>
-        <div class="story-container">
+
+        <div class="glass-panel story-container">
             <div class="story">
                 <!-- Story content will be dynamically updated here -->
             </div>
@@ -947,19 +309,47 @@
             </div>
         </div>
         
-        <div class="inventory">
-            <h3>Inventory:</h3>
-            <ul id="inventory-list" style="display: none;">
+        <div class="glass-panel">
+            <h3 class="kinetic-text">Inventory</h3>
+            <ul id="inventory-list">
                 <!-- Inventory items will be dynamically added here -->
             </ul>
-            <button onclick="toggleInventory()">Show Inventory</button>
         </div>
         
-        <button onclick="customizeCharacter()">Start Adventure</button>
-        <button onclick="playAudio()">Read Aloud</button>
+        <div class="three-d-element"></div>
+
+        <img src="https://source.unsplash.com/random/800x400" alt="Adventure Scene" class="edgeless-image">
+
+        <div class="retro-max">
+            Epic Quest Awaits
+        </div>
+
+        <div class="large-type">
+            Your Journey Begins
+        </div>
+
+        <div class="bento-grid">
+            <div class="bento-item">Main Story</div>
+            <div class="bento-item">Character Stats</div>
+            <div class="bento-item">Achievements</div>
+            <div class="bento-item">Map</div>
+            <div class="bento-item">Quests</div>
+        </div>
+
+        <button onclick="startAdventure()" class="micro-interaction">Embark on Adventure</button>
+        <button onclick="toggleAudio()" class="micro-interaction">Toggle Narration</button>
     </div>
 
+    <button id="voiceButton" onclick="toggleVoiceControl()">🎤</button>
+
     <script>
+        let currentScene = "";
+        let characterName = "Adventurer";
+        let inventory = [];
+        let audioEnabled = false;
+        let voiceControlEnabled = false;
+        let synth = window.speechSynthesis;
+
         const storyData = {
             adventure: {
                 start: {
@@ -1368,116 +758,109 @@
                 }
             }
         };
-        
-        let currentScene = "";
-        let characterName = "Unknown";
-        let inventory = [];
-        
+
         function displayCategories() {
             const categorySelect = document.getElementById('category');
             const categories = Object.keys(storyData);
-            categorySelect.innerHTML = "";
-            categories.forEach(category => {
-                const option = document.createElement('option');
-                option.value = category;
-                option.textContent = category.charAt(0).toUpperCase() + category.slice(1);
-                categorySelect.appendChild(option);
-            });
+            categorySelect.innerHTML = categories.map(category => 
+                `<option value="${category}">${category.charAt(0).toUpperCase() + category.slice(1)}</option>`
+            ).join('');
+            displayStories(categories[0]);
         }
-        
+
         function displayStories(category) {
             const storySelect = document.getElementById('story');
             const stories = Object.keys(storyData[category]);
-            storySelect.innerHTML = "";
-            stories.forEach(story => {
-                const option = document.createElement('option');
-                option.value = story;
-                option.textContent = storyData[category][story].title;
-                storySelect.appendChild(option);
-            });
+            storySelect.innerHTML = stories.map(story => 
+                `<option value="${story}">${storyData[category][story].title}</option>`
+            ).join('');
         }
-        
-        function customizeCharacter() {
-            const charNameInput = document.getElementById('charName');
-            const charImageInput = document.getElementById('charImage');
-            characterName = charNameInput.value;
+
+        function startAdventure() {
+            characterName = document.getElementById('charName').value || "Adventurer";
             const category = document.getElementById('category').value;
             const story = document.getElementById('story').value;
             currentScene = story;
             displayScene(currentScene, category);
+            document.querySelector('.story-container').scrollIntoView({ behavior: 'smooth' });
         }
-        
+
         function displayScene(scene, category) {
             const storyElement = document.querySelector('.story');
             const choicesElement = document.querySelector('.choices');
             const currentStory = storyData[category][scene];
-            storyElement.innerHTML = `<h2>${currentStory.title}</h2><p>${currentStory.text}</p>`;
-            choicesElement.innerHTML = "";
-        
-            // Update inventory display
-            displayInventory(currentStory.items);
-            
-            currentStory.choices.forEach(choice => {
-                const button = document.createElement('button');
-                button.textContent = choice.text;
-                button.addEventListener('click', () => {
-                    currentScene = choice.next;
-                    displayScene(currentScene, category);
-                });
-                choicesElement.appendChild(button);
-            });
-         }
-          function displayInventory(items) {
-                const inventoryElement = document.getElementById('inventory-list');
-                inventoryElement.innerHTML = "<h3>Inventory:</h3>";
-                if (items && items.length > 0) {
-                    items.forEach(item => {
-                        inventory.push(item);
-                        const button = document.createElement('button');
-                        button.textContent = item;
-                        button.addEventListener('click', () => {
-                            alert(`You have collected: ${item}`);
-                        });
-                        inventoryElement.appendChild(button);
-                    });
-                } else {
-                    inventoryElement.innerHTML += "<p>No new items added.</p>";
-                }
-            }
-            
-        
-        function toggleInventory() {
-            const inventoryList = document.getElementById('inventory-list');
-            if (inventoryList.style.display === 'none') {
-                inventoryList.style.display = 'block';
-            } else {
-                inventoryList.style.display = 'none';
-            }
-        }
-        
-        // Initialize the story categories
-        displayCategories();
-        
-        // Event listeners for category and story selection
-        document.getElementById('category').addEventListener('change', (event) => {
-            const selectedCategory = event.target.value;
-            displayStories(selectedCategory);
-        });
-        
-        document.getElementById('story').addEventListener('change', (event) => {
-            const selectedStory = event.target.value;
-            currentScene = selectedStory;
-            const selectedCategory = document.getElementById('category').value;
-            displayScene(currentScene, selectedCategory);
-        });
-        
-        function playAudio() {
-            const currentStory = storyData[document.getElementById('category').value][currentScene];
-            const speech = new SpeechSynthesisUtterance(currentStory.text);
-            window.speechSynthesis.speak(speech);
-        }
-        
 
+            storyElement.innerHTML = `<h2>${currentStory.title}</h2><p>${currentStory.text.replace(/Adventurer/g, characterName)}</p>`;
+            choicesElement.innerHTML = currentStory.choices.map(choice => 
+                `<button onclick="makeChoice('${choice.next}', '${category}')">${choice.text}</button>`
+            ).join('');
+
+            updateInventory(currentStory.items);
+            if (audioEnabled) narrate(currentStory.text);
+        }
+
+        function makeChoice(nextScene, category) {
+            currentScene = nextScene;
+            displayScene(currentScene, category);
+        }
+
+        function updateInventory(newItems) {
+            if (newItems) {
+                inventory = [...new Set([...inventory, ...newItems])];
+            }
+            const inventoryList = document.getElementById('inventory-list');
+            inventoryList.innerHTML = inventory.map(item => `<li>${item}</li>`).join('');
+        }
+
+        function toggleAudio() {
+            audioEnabled = !audioEnabled;
+            if (audioEnabled) {
+                narrate("Audio narration enabled");
+            } else {
+                synth.cancel();
+            }
+        }
+
+        function narrate(text) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            synth.speak(utterance);
+        }
+
+        function toggleVoiceControl() {
+            voiceControlEnabled = !voiceControlEnabled;
+            if (voiceControlEnabled) {
+                startVoiceRecognition();
+            } else {
+                stopVoiceRecognition();
+            }
+        }
+
+        function startVoiceRecognition() {
+            // Implement voice recognition logic here
+            console.log("Voice control activated");
+        }
+
+        function stopVoiceRecognition() {
+            // Implement logic to stop voice recognition
+            console.log("Voice control deactivated");
+        }
+
+        // Initialize the story
+        displayCategories();
+
+        // Event listeners
+        document.getElementById('category').addEventListener('change', (event) => {
+            displayStories(event.target.value);
+        });
+
+        // AI-driven personalization (simulated)
+        function personalizeExperience() {
+            console.log("Personalizing experience for " + characterName);
+            // Implement AI-driven personalization logic here
+        }
+
+        // Call personalization when starting the adventure
+        document.querySelector('button[onclick="startAdventure()"]').addEventListener('click', personalizeExperience);
     </script>
-</body>
-</html>
+    </body>
+    </html>
